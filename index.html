@@ -263,6 +263,153 @@
 
     
     
+      
+      
+        
+        
+        
+      
+
+      
+    
+
+    
+      
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/12/05/android-arch-long-link/" itemprop="url">
+                  Android 架构之长连接技术
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-motorcycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2018-12-05T15:43:15+08:00" content="2018-12-05">
+              2018-12-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/亿级Android架构/" itemprop="url" rel="index">
+                    <span itemprop="name">亿级Android架构</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            3,986 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>本文首发于小专栏《<a href="https://xiaozhuanlan.com/topic/3758142906" target="_blank" rel="external">Android 架构之长连接技术</a>》，更多Android架构文章欢迎关注《<a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">亿级Android架构</a>》</p>
+</blockquote>
+<p>上一篇文章<a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络框架（上）》</a>中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合<a href="https://github.com/Tencent/mars" target="_blank" rel="external">腾讯Mars框架</a>和<a href="https://tech.meituan.com/Shark_SDK.html" target="_blank" rel="external">美团Shark体系</a>等业内主流长连接方案，谈一谈长连接技术的各个方面。</p>
+<p>本文会包括下面的技术点：</p>
+<ul>
+<li>长连接与Http短连接、Keep-Alive傻傻分不清</li>
+<li>你为什么需要长连接</li>
+<li>长连接何时会断开</li>
+<li>如何建立稳定长连接</li>
+<li>Mars智能心跳机制</li>
+<li>长连接数据协议及加密</li>
+<li>长连接通道建设及容灾</li>
+</ul>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2018/12/05/android-arch-long-link/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
 
     
       
@@ -1351,123 +1498,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/05/03/Java-技术之注解-Annotation/" itemprop="url">
-                  Java 技术之注解 Annotation
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          
-            <i class="fa fa-rocket"></i>
-            
-
-
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2017-05-03T10:47:11+08:00" content="2017-05-03">
-              2017-05-03
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
-                    <span itemprop="name">深入理解Java技术</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          <span=>
-            &nbsp; | &nbsp;
-            2,568 字
-          </span>
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <blockquote>
-<p><code>注解</code>这种语法本身很有意思，当前很多流行库如 <code>Dagger</code>、<code>ButterKnife</code>等都是基于注解这种语法。</p>
-<p>熟练使用<code>注解</code>，既能让你的代码变得简洁易读，动态运行时执行你想要的操作，还能帮你生成代码，省去重复代码写作。</p>
-<p>本文涉及知识点：注解的生命周期，代码编辑时注解，编译时注解代码生成，运行时注解动态反射。</p>
-</blockquote>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/05/03/Java-技术之注解-Annotation/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-      
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
 
   </section>
 
@@ -1514,7 +1544,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1528,7 +1558,7 @@
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">26</span>
+              <span class="site-state-item-count">28</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
