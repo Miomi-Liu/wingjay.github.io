@@ -263,15 +263,144 @@
 
     
     
+
+    
       
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2019/01/16/mobile-network-connection/" itemprop="url">
+                  Android 架构之高可用移动网络连接
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-bicycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2019-01-16T11:36:02+08:00" content="2019-01-16">
+              2019-01-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/亿级Android架构/" itemprop="url" rel="index">
+                    <span itemprop="name">亿级Android架构</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            3,362 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
       
-        
-        
-        
       
 
       
-    
+        
+          <p>读者好，前面我们在<a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络连接与加速》</a>和<a href="https://xiaozhuanlan.com/topic/3758142906" target="_blank" rel="external">《Android 架构之长连接技术》</a>两篇文章中，讲解了<code>Http短连接、TCP长连接、连接复用与速度优化、数据压缩</code>等方面的知识点。不过，真实的网络环境是很复杂的，存在各种各样的因素会导致网络服务不可用，比如DNS劫持、服务器宕机、弱网等。换言之，如果服务都不可用，那上面这些优化也就没有意义了。</p>
+<p>因此，本文主要谈一下在真实的网络环境下，存在哪些常见的网络不可用原因，以及大多数公司是如何解决并兜底，从而达到<code>高可用连接</code>这个目标的。</p>
+<p>文章会从下面几方面进行阐述：</p>
+<ul>
+<li>DNS劫持与可靠IP获取<ul>
+<li>HttpDNS</li>
+<li>内置IP列表+自动测速</li>
+</ul>
+</li>
+<li>IP列表的缓存更新策略</li>
+<li>IP列表可用性兜底策略</li>
+<li>针对弱网的多IP复合连接测速</li>
+<li>自主网络诊断</li>
+</ul>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2019/01/16/mobile-network-connection/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
 
     
       
@@ -354,7 +483,7 @@
 
           <span=>
             &nbsp; | &nbsp;
-            3,986 字
+            4,189 字
           </span>
 
           
@@ -371,10 +500,7 @@
 
       
         
-          <blockquote>
-<p>本文首发于小专栏《<a href="https://xiaozhuanlan.com/topic/3758142906" target="_blank" rel="external">Android 架构之长连接技术</a>》，更多Android架构文章欢迎关注《<a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">亿级Android架构</a>》</p>
-</blockquote>
-<p>上一篇文章<a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络框架（上）》</a>中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合<a href="https://github.com/Tencent/mars" target="_blank" rel="external">腾讯Mars框架</a>和<a href="https://tech.meituan.com/Shark_SDK.html" target="_blank" rel="external">美团Shark体系</a>等业内主流长连接方案，谈一谈长连接技术的各个方面。</p>
+          <p>上一篇文章<a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络框架（上）》</a>中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合<a href="https://github.com/Tencent/mars" target="_blank" rel="external">腾讯Mars框架</a>和<a href="https://tech.meituan.com/Shark_SDK.html" target="_blank" rel="external">美团Shark体系</a>等业内主流长连接方案，谈一谈长连接技术的各个方面。</p>
 <p>本文会包括下面的技术点：</p>
 <ul>
 <li>长连接与Http短连接、Keep-Alive傻傻分不清</li>
@@ -492,7 +618,7 @@
 
           <span=>
             &nbsp; | &nbsp;
-            2,149 字
+            2,371 字
           </span>
 
           
@@ -509,10 +635,7 @@
 
       
         
-          <blockquote>
-<p><a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">《亿级 Android 架构》</a> 小专栏地址：<a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">https://xiaozhuanlan.com/AndroidArch</a></p>
-</blockquote>
-<p>各位好，很久没空来写点东西（忙+懒），快年底了，准备抽空写一写。由于今年一直在做一些Android架构方面的工作，所以准备以这个角度为切入点。</p>
+          <p>各位好，很久没空来写点东西（忙+懒），快年底了，准备抽空写一写。由于今年一直在做一些Android架构方面的工作，所以准备以这个角度为切入点。</p>
 <p>本篇文章随谈一些关于Android架构的东西，包括写这个专栏的初衷、具体包括哪些技术点等。</p>
 <h2 id="业务同学需要了解架构吗？"><a href="#业务同学需要了解架构吗？" class="headerlink" title="业务同学需要了解架构吗？"></a>业务同学需要了解架构吗？</h2><p>有的同学会问，我平常都在写业务代码、写页面、调用SDK，有必要去了解架构吗？答案很简单，<strong>业务是表，架构是里</strong>。变化万千的业务背后都是大同小异的架构。时代更迭，业务变迁，理解架构的技术人员可以处变不惊，而非疲于奔命。</p>
 <p>因此，本人建议业务同学在繁重的业务开发之余，可以多去研究一些底层库原理，而非停留在花式调用SDK的阶段，这会让你具备更强的技术竞争力。</p>
@@ -1380,124 +1503,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/05/08/java_classloader/" itemprop="url">
-                  Java 技术之类加载机制
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          
-            <i class="fa fa-subway"></i>
-            
-
-
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2017-05-08T20:46:38+08:00" content="2017-05-08">
-              2017-05-08
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
-                    <span itemprop="name">深入理解Java技术</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          <span=>
-            &nbsp; | &nbsp;
-            3,058 字
-          </span>
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <blockquote>
-<p>类加载机制是 Java 语言的一大亮点，使得 Java 类可以被动态加载到 Java 虚拟机中。</p>
-<p>这次我们抛开术语和概念，从例子入手，由浅入深地讲解 Java 的类加载机制。</p>
-<p>本文涉及知识点：双亲委托机制、BootstrapClassLoader、ExtClassLoader、AppClassLoader、自定义网络类加载器等</p>
-<p>文章涉及代码：<br><a href="https://github.com/wingjay/HelloJava/blob/master/common/src/classloader/HelloClassLoader.java" target="_blank" rel="external">https://github.com/wingjay/HelloJava/blob/master/common/src/classloader/HelloClassLoader.java</a></p>
-</blockquote>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/05/08/java_classloader/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-      
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
 
   </section>
 
@@ -1544,7 +1549,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-count">36</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1558,7 +1563,7 @@
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-count">29</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
@@ -1627,7 +1632,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="icon-next-heart fa fa-heart"></i>
   </span>

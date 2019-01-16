@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wingjay.com/"/>
-  <updated>2018-12-05T07:49:00.822Z</updated>
+  <updated>2019-01-16T03:43:42.783Z</updated>
   <id>http://wingjay.com/</id>
   
   <author>
@@ -16,18 +16,56 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Android 架构之高可用移动网络连接</title>
+    <link href="http://wingjay.com/2019/01/16/mobile-network-connection/"/>
+    <id>http://wingjay.com/2019/01/16/mobile-network-connection/</id>
+    <published>2019-01-16T03:36:02.000Z</published>
+    <updated>2019-01-16T03:43:42.783Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;读者好，前面我们在&lt;a href=&quot;https://xiaozhuanlan.com/topic/6982074351&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《Android 架构之网络连接与加速》&lt;/a&gt;和&lt;a href=&quot;https://xiaozhuanlan.com/topic/3758142906&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《Android 架构之长连接技术》&lt;/a&gt;两篇文章中，讲解了&lt;code&gt;Http短连接、TCP长连接、连接复用与速度优化、数据压缩&lt;/code&gt;等方面的知识点。不过，真实的网络环境是很复杂的，存在各种各样的因素会导致网络服务不可用，比如DNS劫持、服务器宕机、弱网等。换言之，如果服务都不可用，那上面这些优化也就没有意义了。&lt;/p&gt;
+&lt;p&gt;因此，本文主要谈一下在真实的网络环境下，存在哪些常见的网络不可用原因，以及大多数公司是如何解决并兜底，从而达到&lt;code&gt;高可用连接&lt;/code&gt;这个目标的。&lt;/p&gt;
+&lt;p&gt;文章会从下面几方面进行阐述：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;DNS劫持与可靠IP获取&lt;ul&gt;
+&lt;li&gt;HttpDNS&lt;/li&gt;
+&lt;li&gt;内置IP列表+自动测速&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;IP列表的缓存更新策略&lt;/li&gt;
+&lt;li&gt;IP列表可用性兜底策略&lt;/li&gt;
+&lt;li&gt;针对弱网的多IP复合连接测速&lt;/li&gt;
+&lt;li&gt;自主网络诊断&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Android" scheme="http://wingjay.com/categories/Android/"/>
+    
+      <category term="亿级Android架构" scheme="http://wingjay.com/categories/Android/%E4%BA%BF%E7%BA%A7Android%E6%9E%B6%E6%9E%84/"/>
+    
+    
+      <category term="Android" scheme="http://wingjay.com/tags/Android/"/>
+    
+      <category term="架构" scheme="http://wingjay.com/tags/%E6%9E%B6%E6%9E%84/"/>
+    
+      <category term="高可用" scheme="http://wingjay.com/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/"/>
+    
+      <category term="网络" scheme="http://wingjay.com/tags/%E7%BD%91%E7%BB%9C/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Android 架构之长连接技术</title>
     <link href="http://wingjay.com/2018/12/05/android-arch-long-link/"/>
     <id>http://wingjay.com/2018/12/05/android-arch-long-link/</id>
     <published>2018-12-05T07:43:15.000Z</published>
-    <updated>2018-12-05T07:49:00.822Z</updated>
+    <updated>2019-01-16T03:42:50.850Z</updated>
     
     <summary type="html">
     
-      &lt;blockquote&gt;
-&lt;p&gt;本文首发于小专栏《&lt;a href=&quot;https://xiaozhuanlan.com/topic/3758142906&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Android 架构之长连接技术&lt;/a&gt;》，更多Android架构文章欢迎关注《&lt;a href=&quot;https://xiaozhuanlan.com/AndroidArch&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;亿级Android架构&lt;/a&gt;》&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;上一篇文章&lt;a href=&quot;https://xiaozhuanlan.com/topic/6982074351&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《Android 架构之网络框架（上）》&lt;/a&gt;中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合&lt;a href=&quot;https://github.com/Tencent/mars&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;腾讯Mars框架&lt;/a&gt;和&lt;a href=&quot;https://tech.meituan.com/Shark_SDK.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;美团Shark体系&lt;/a&gt;等业内主流长连接方案，谈一谈长连接技术的各个方面。&lt;/p&gt;
+      &lt;p&gt;上一篇文章&lt;a href=&quot;https://xiaozhuanlan.com/topic/6982074351&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《Android 架构之网络框架（上）》&lt;/a&gt;中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合&lt;a href=&quot;https://github.com/Tencent/mars&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;腾讯Mars框架&lt;/a&gt;和&lt;a href=&quot;https://tech.meituan.com/Shark_SDK.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;美团Shark体系&lt;/a&gt;等业内主流长连接方案，谈一谈长连接技术的各个方面。&lt;/p&gt;
 &lt;p&gt;本文会包括下面的技术点：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;长连接与Http短连接、Keep-Alive傻傻分不清&lt;/li&gt;
@@ -50,9 +88,9 @@
     
       <category term="架构" scheme="http://wingjay.com/tags/%E6%9E%B6%E6%9E%84/"/>
     
-      <category term="长连接" scheme="http://wingjay.com/tags/%E9%95%BF%E8%BF%9E%E6%8E%A5/"/>
-    
       <category term="网络" scheme="http://wingjay.com/tags/%E7%BD%91%E7%BB%9C/"/>
+    
+      <category term="长连接" scheme="http://wingjay.com/tags/%E9%95%BF%E8%BF%9E%E6%8E%A5/"/>
     
   </entry>
   
@@ -61,14 +99,11 @@
     <link href="http://wingjay.com/2018/11/26/%E3%80%8A%E4%BA%BF%E7%BA%A7-Android-%E6%9E%B6%E6%9E%84%E3%80%8B%E4%B8%93%E6%A0%8F%E9%9A%8F%E8%B0%88/"/>
     <id>http://wingjay.com/2018/11/26/《亿级-Android-架构》专栏随谈/</id>
     <published>2018-11-26T06:34:44.000Z</published>
-    <updated>2018-11-26T06:56:27.482Z</updated>
+    <updated>2019-01-16T03:40:33.390Z</updated>
     
     <summary type="html">
     
-      &lt;blockquote&gt;
-&lt;p&gt;&lt;a href=&quot;https://xiaozhuanlan.com/AndroidArch&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;《亿级 Android 架构》&lt;/a&gt; 小专栏地址：&lt;a href=&quot;https://xiaozhuanlan.com/AndroidArch&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://xiaozhuanlan.com/AndroidArch&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;各位好，很久没空来写点东西（忙+懒），快年底了，准备抽空写一写。由于今年一直在做一些Android架构方面的工作，所以准备以这个角度为切入点。&lt;/p&gt;
+      &lt;p&gt;各位好，很久没空来写点东西（忙+懒），快年底了，准备抽空写一写。由于今年一直在做一些Android架构方面的工作，所以准备以这个角度为切入点。&lt;/p&gt;
 &lt;p&gt;本篇文章随谈一些关于Android架构的东西，包括写这个专栏的初衷、具体包括哪些技术点等。&lt;/p&gt;
 &lt;h2 id=&quot;业务同学需要了解架构吗？&quot;&gt;&lt;a href=&quot;#业务同学需要了解架构吗？&quot; class=&quot;headerlink&quot; title=&quot;业务同学需要了解架构吗？&quot;&gt;&lt;/a&gt;业务同学需要了解架构吗？&lt;/h2&gt;&lt;p&gt;有的同学会问，我平常都在写业务代码、写页面、调用SDK，有必要去了解架构吗？答案很简单，&lt;strong&gt;业务是表，架构是里&lt;/strong&gt;。变化万千的业务背后都是大同小异的架构。时代更迭，业务变迁，理解架构的技术人员可以处变不惊，而非疲于奔命。&lt;/p&gt;
 &lt;p&gt;因此，本人建议业务同学在繁重的业务开发之余，可以多去研究一些底层库原理，而非停留在花式调用SDK的阶段，这会让你具备更强的技术竞争力。&lt;/p&gt;
@@ -499,30 +534,6 @@
     </summary>
     
       <category term="Android" scheme="http://wingjay.com/categories/Android/"/>
-    
-    
-      <category term="Android" scheme="http://wingjay.com/tags/Android/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>谈谈移动应用的安全性实践</title>
-    <link href="http://wingjay.com/2016/08/30/%E8%B0%88%E8%B0%88%E7%A7%BB%E5%8A%A8%E5%BA%94%E7%94%A8%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E5%AE%9E%E8%B7%B5/"/>
-    <id>http://wingjay.com/2016/08/30/谈谈移动应用的安全性实践/</id>
-    <published>2016-08-30T13:39:01.000Z</published>
-    <updated>2018-11-26T06:56:27.489Z</updated>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;虽然没有完美的安全性，但我们所做的每一步都能加大被攻击的难度。&lt;/p&gt;
-&lt;/blockquote&gt;
-    
-    </summary>
-    
-      <category term="Android" scheme="http://wingjay.com/categories/Android/"/>
-    
-      <category term="安全" scheme="http://wingjay.com/categories/Android/%E5%AE%89%E5%85%A8/"/>
     
     
       <category term="Android" scheme="http://wingjay.com/tags/Android/"/>

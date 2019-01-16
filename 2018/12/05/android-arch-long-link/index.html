@@ -35,7 +35,7 @@
 <link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,架构,长连接,网络," />
+  <meta name="keywords" content="Android,架构,网络,长连接," />
 
 
 
@@ -53,14 +53,16 @@
 
 
 
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
 
-<meta name="description" content="本文首发于小专栏《Android 架构之长连接技术》，更多Android架构文章欢迎关注《亿级Android架构》  上一篇文章《Android 架构之网络框架（上）》中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合腾讯Mars框架和美团Shark体系等业内主流长连接方案，谈一谈长连接技术的各个方面。 本文会包括下面的技术点：  长连接与H">
-<meta name="keywords" content="Android,架构,长连接,网络">
+
+<meta name="description" content="上一篇文章《Android 架构之网络框架（上）》中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合腾讯Mars框架和美团Shark体系等业内主流长连接方案，谈一谈长连接技术的各个方面。 本文会包括下面的技术点：  长连接与Http短连接、Keep-Alive傻傻分不清 你为什么需要长连接 长连接何时会断开 如何建立稳定长连接 Mars智能心跳">
+<meta name="keywords" content="Android,架构,网络,长连接">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android 架构之长连接技术">
 <meta property="og:url" content="http://wingjay.com/2018/12/05/android-arch-long-link/index.html">
 <meta property="og:site_name" content="wingjay">
-<meta property="og:description" content="本文首发于小专栏《Android 架构之长连接技术》，更多Android架构文章欢迎关注《亿级Android架构》  上一篇文章《Android 架构之网络框架（上）》中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合腾讯Mars框架和美团Shark体系等业内主流长连接方案，谈一谈长连接技术的各个方面。 本文会包括下面的技术点：  长连接与H">
+<meta property="og:description" content="上一篇文章《Android 架构之网络框架（上）》中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合腾讯Mars框架和美团Shark体系等业内主流长连接方案，谈一谈长连接技术的各个方面。 本文会包括下面的技术点：  长连接与Http短连接、Keep-Alive傻傻分不清 你为什么需要长连接 长连接何时会断开 如何建立稳定长连接 Mars智能心跳">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://diycode.b0.upaiyun.com/photo/2018/4b0801aef3c69c00d38d1cc688bf13ba.png">
 <meta property="og:image" content="https://diycode.b0.upaiyun.com/photo/2018/e8055c916f15c34aa03f6d230235841b.png">
@@ -70,10 +72,10 @@
 <meta property="og:image" content="https://diycode.b0.upaiyun.com/photo/2018/5a11a944950af332e46829a071bf8cc6.png">
 <meta property="og:image" content="https://diycode.b0.upaiyun.com/photo/2018/3f79b7910c7d811c43344652a30ef63b.png">
 <meta property="og:image" content="https://diycode.b0.upaiyun.com/photo/2018/5e97a86e0a4286a4398510ed77c38b1a.png">
-<meta property="og:updated_time" content="2018-12-05T07:49:00.822Z">
+<meta property="og:updated_time" content="2019-01-16T03:42:50.850Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android 架构之长连接技术">
-<meta name="twitter:description" content="本文首发于小专栏《Android 架构之长连接技术》，更多Android架构文章欢迎关注《亿级Android架构》  上一篇文章《Android 架构之网络框架（上）》中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合腾讯Mars框架和美团Shark体系等业内主流长连接方案，谈一谈长连接技术的各个方面。 本文会包括下面的技术点：  长连接与H">
+<meta name="twitter:description" content="上一篇文章《Android 架构之网络框架（上）》中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合腾讯Mars框架和美团Shark体系等业内主流长连接方案，谈一谈长连接技术的各个方面。 本文会包括下面的技术点：  长连接与Http短连接、Keep-Alive傻傻分不清 你为什么需要长连接 长连接何时会断开 如何建立稳定长连接 Mars智能心跳">
 <meta name="twitter:image" content="https://diycode.b0.upaiyun.com/photo/2018/4b0801aef3c69c00d38d1cc688bf13ba.png">
 
 
@@ -349,7 +351,7 @@
 
           <span=>
             &nbsp; | &nbsp;
-            3,986 字
+            4,189 字
           </span>
 
           
@@ -365,10 +367,7 @@
       
 
       
-        <span itemprop="articleBody"><blockquote>
-<p>本文首发于小专栏《<a href="https://xiaozhuanlan.com/topic/3758142906" target="_blank" rel="external">Android 架构之长连接技术 </a>》，更多 Android 架构文章欢迎关注《<a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external"> 亿级 Android 架构</a>》</p>
-</blockquote>
-<p>上一篇文章 <a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络框架（上）》</a> 中，我们谈过了网络框架 OkHttp、网络加速方案如 HttpDNS、数据压缩与序列化等技术点。本文我们结合 <a href="https://github.com/Tencent/mars" target="_blank" rel="external"> 腾讯 Mars 框架 </a> 和<a href="https://tech.meituan.com/Shark_SDK.html" target="_blank" rel="external">美团 Shark 体系 </a> 等业内主流长连接方案，谈一谈长连接技术的各个方面。</p>
+        <span itemprop="articleBody"><p>上一篇文章 <a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络框架（上）》</a> 中，我们谈过了网络框架 OkHttp、网络加速方案如 HttpDNS、数据压缩与序列化等技术点。本文我们结合 <a href="https://github.com/Tencent/mars" target="_blank" rel="external"> 腾讯 Mars 框架 </a> 和<a href="https://tech.meituan.com/Shark_SDK.html" target="_blank" rel="external">美团 Shark 体系 </a> 等业内主流长连接方案，谈一谈长连接技术的各个方面。</p>
 <p>本文会包括下面的技术点：</p>
 <ul>
 <li>长连接与 Http 短连接、Keep-Alive 傻傻分不清</li>
@@ -455,6 +454,23 @@
 <h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 本文结合了国内大厂如腾讯、美团等长连接框架，针对长连接这个技术点做了完整的介绍和剖析，如有不对或疑问，欢迎留言。</p>
 <hr>
 <p>谢谢。<br>wingjay</p>
+<hr>
+<h3 id="《亿级 Android 架构》小专栏介绍"><a href="#《亿级 Android 架构》小专栏介绍" class="headerlink" title="《亿级 Android 架构》小专栏介绍"></a>《亿级 Android 架构》小专栏介绍 </h3><p> 业务的快速增长离不开稳定可靠的架构。<a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">《亿级 Android 架构》</a>小专栏会基于作者实际工作经验，结合国内大厂如阿里、腾讯、美团等基础架构现状，尝试谈谈如何设计一套好的架构来支持业务从 0 到 1，甚至到亿，希望与大家多多探讨。</p>
+<p>本专栏主要内容：</p>
+<ol>
+<li>当前大厂有哪些 Android 架构；</li>
+<li>这些架构能解决什么问题；</li>
+<li>这些架构的原理是什么；</li>
+<li>学习这些架构对我们自身的意义。</li>
+</ol>
+<p><strong><a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">《亿级 Android 架构》</a>小专栏文章列表：</strong></p>
+<p><a href="https://xiaozhuanlan.com/topic/1934527806" target="_blank" rel="external">《亿级 Android 架构》专栏随谈》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络连接与加速》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/3758142906" target="_blank" rel="external">《Android 架构之长连接技术》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/2130768549" target="_blank" rel="external">《Android 架构之高可用移动网络连接》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/8159302674" target="_blank" rel="external">《Android 架构之网络安全演进》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/2694081375" target="_blank" rel="external">《Android 架构之高性能移动端日志系统》</a></p>
+<hr>
 <h2 id="参考："><a href="# 参考：" class="headerlink" title="参考："></a>参考：</h2><p><a href="http://www.52im.net/thread-120-1-1.html" target="_blank" rel="external">《移动端 IM 实践：实现 Android 版微信的智能心跳机制》</a><br><a href="http://www.52im.net/thread-341-1-1.html" target="_blank" rel="external">《Android 端消息推送总结：实现原理、心跳保活、遇到的问题等》</a><br><a href="https://tech.meituan.com/Shark_SDK.html" target="_blank" rel="external">《美团点评移动网络优化实践</a><br><a href="http://www.52im.net/thread-209-1-1.html" target="_blank" rel="external">《Android 版微信后台保活实战分享(网络保活篇)》</a><br><a href="https://blog.cnbang.net/tech/3531/" target="_blank" rel="external">《移动 APP 网络优化概述》</a><br><a href="https://blog.csdn.net/carson_ho/article/details/79522975" target="_blank" rel="external">《高效 保活长连接：手把手教你实现 自适应的心跳保活机制》</a><br><a href="http://www.52im.net/thread-783-1-1.html" target="_blank" rel="external">《一种 Android 端 IM 智能心跳算法的设计与实现探讨》</a><br><a href="https://cloud.tencent.com/document/product/214/4149" target="_blank" rel="external">《HTTP 长连接说明》</a><br><a href="https://halfrost.com/advance_tcp/" target="_blank" rel="external">《TCP 进阶》</a></p>
 </span>
       
@@ -468,16 +484,16 @@
           
             <a href="/tags/架构/" rel="tag">#架构</a>
           
-            <a href="/tags/长连接/" rel="tag">#长连接</a>
-          
             <a href="/tags/网络/" rel="tag">#网络</a>
+          
+            <a href="/tags/长连接/" rel="tag">#长连接</a>
           
         </div>
       
 
       
         <div class="post-nav">
-          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/11/02/干货-Glow-Android-优化实践/">[干货] Glow Android 优化实践</a></li></ul>
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2016/11/02/干货-Glow-Android-优化实践/">[干货] Glow Android 优化实践</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li></ul>
         </div>  
       
       
@@ -493,9 +509,166 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019/01/16/mobile-network-connection/" rel="prev" title="Android 架构之高可用移动网络连接">
+                Android 架构之高可用移动网络连接 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/32')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/32/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
 
       
 
@@ -561,7 +734,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-count">36</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -575,7 +748,7 @@
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-count">29</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
@@ -640,7 +813,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I- 长连接与 Http 短连接、Keep-Alive 傻傻分不清"><span class="nav-number">1.</span> <span class="nav-text">I. 长连接与 Http 短连接、Keep-Alive 傻傻分不清 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#长连接 -vs-Http 短连接"><span class="nav-number">1.1.</span> <span class="nav-text">长连接 vs Http 短连接 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#长连接 -vs-Http 的 Keep-Alive"><span class="nav-number">1.2.</span> <span class="nav-text">长连接 vs Http 的 Keep-Alive</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP 的 Keep-Alive-vs-Http 的 Keep-Alive"><span class="nav-number">1.3.</span> <span class="nav-text">TCP 的 Keep-Alive vs Http 的Keep-Alive</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II- 你为什么需要长连接"><span class="nav-number">2.</span> <span class="nav-text">II. 你为什么需要长连接 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1- 不同域名的请求可以复用同一个长连接通道"><span class="nav-number">2.0.1.</span> <span class="nav-text">1. 不同域名的请求可以复用同一个长连接通道 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 不依赖 DNS，无 DNS 耗时和劫持等问题"><span class="nav-number">2.0.2.</span> <span class="nav-text">2. 不依赖 DNS，无 DNS 耗时和劫持等问题 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 如果有大量网络请求，可以明显减少网络延时，节省带宽"><span class="nav-number">2.0.3.</span> <span class="nav-text">3. 如果有大量网络请求，可以明显减少网络延时，节省带宽 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4- 服务端主动 Push 数据到客户端"><span class="nav-number">2.0.4.</span> <span class="nav-text">4. 服务端主动 Push 数据到客户端 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III- 长连接何时会断开？"><span class="nav-number">3.</span> <span class="nav-text">III. 长连接何时会断开？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1- 长连接所在进程被杀"><span class="nav-number">3.0.1.</span> <span class="nav-text">1. 长连接所在进程被杀 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 用户切换网络"><span class="nav-number">3.0.2.</span> <span class="nav-text">2. 用户切换网络 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 系统休眠等导致 NAT 超时"><span class="nav-number">3.0.3.</span> <span class="nav-text">3. 系统休眠等导致 NAT 超时 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-DHCP- 租期"><span class="nav-number">3.0.4.</span> <span class="nav-text">4. DHCP 租期</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV- 如何建立稳定长连接？"><span class="nav-number">4.</span> <span class="nav-text">IV. 如何建立稳定长连接？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Mars 长连接独立进程"><span class="nav-number">4.0.1.</span> <span class="nav-text">1. Mars 长连接独立进程 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 长连接进程复活"><span class="nav-number">4.0.2.</span> <span class="nav-text">2. 长连接进程复活 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 心跳机制"><span class="nav-number">4.0.3.</span> <span class="nav-text">3. 心跳机制 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4- 断开重连"><span class="nav-number">4.0.4.</span> <span class="nav-text">4. 断开重连 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#V-Mars 智能心跳机制"><span class="nav-number">5.</span> <span class="nav-text">V. Mars 智能心跳机制 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1- 固定心跳机制"><span class="nav-number">5.1.</span> <span class="nav-text">1. 固定心跳机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Mars 智能心跳策略"><span class="nav-number">5.2.</span> <span class="nav-text">2. Mars 智能心跳策略 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#自适应心跳"><span class="nav-number">5.2.0.1.</span> <span class="nav-text">自适应心跳 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#前后台策略"><span class="nav-number">5.2.0.2.</span> <span class="nav-text">前后台策略 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Alarm 对齐策略"><span class="nav-number">5.2.0.3.</span> <span class="nav-text">Alarm 对齐策略 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#其他"><span class="nav-number">5.2.0.4.</span> <span class="nav-text">其他 </span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VI- 长连接数据协议及加密"><span class="nav-number">6.</span> <span class="nav-text">VI. 长连接数据协议及加密 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VII- 长连接通道建设及容灾"><span class="nav-number">7.</span> <span class="nav-text">VII. 长连接通道建设及容灾 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">8.</span> <span class="nav-text">小结 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考："><span class="nav-number">9.</span> <span class="nav-text">参考：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I- 长连接与 Http 短连接、Keep-Alive 傻傻分不清"><span class="nav-number">1.</span> <span class="nav-text">I. 长连接与 Http 短连接、Keep-Alive 傻傻分不清 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#长连接 -vs-Http 短连接"><span class="nav-number">1.1.</span> <span class="nav-text">长连接 vs Http 短连接 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#长连接 -vs-Http 的 Keep-Alive"><span class="nav-number">1.2.</span> <span class="nav-text">长连接 vs Http 的 Keep-Alive</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP 的 Keep-Alive-vs-Http 的 Keep-Alive"><span class="nav-number">1.3.</span> <span class="nav-text">TCP 的 Keep-Alive vs Http 的Keep-Alive</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II- 你为什么需要长连接"><span class="nav-number">2.</span> <span class="nav-text">II. 你为什么需要长连接 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1- 不同域名的请求可以复用同一个长连接通道"><span class="nav-number">2.0.1.</span> <span class="nav-text">1. 不同域名的请求可以复用同一个长连接通道 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 不依赖 DNS，无 DNS 耗时和劫持等问题"><span class="nav-number">2.0.2.</span> <span class="nav-text">2. 不依赖 DNS，无 DNS 耗时和劫持等问题 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 如果有大量网络请求，可以明显减少网络延时，节省带宽"><span class="nav-number">2.0.3.</span> <span class="nav-text">3. 如果有大量网络请求，可以明显减少网络延时，节省带宽 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4- 服务端主动 Push 数据到客户端"><span class="nav-number">2.0.4.</span> <span class="nav-text">4. 服务端主动 Push 数据到客户端 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III- 长连接何时会断开？"><span class="nav-number">3.</span> <span class="nav-text">III. 长连接何时会断开？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1- 长连接所在进程被杀"><span class="nav-number">3.0.1.</span> <span class="nav-text">1. 长连接所在进程被杀 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 用户切换网络"><span class="nav-number">3.0.2.</span> <span class="nav-text">2. 用户切换网络 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 系统休眠等导致 NAT 超时"><span class="nav-number">3.0.3.</span> <span class="nav-text">3. 系统休眠等导致 NAT 超时 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-DHCP- 租期"><span class="nav-number">3.0.4.</span> <span class="nav-text">4. DHCP 租期</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV- 如何建立稳定长连接？"><span class="nav-number">4.</span> <span class="nav-text">IV. 如何建立稳定长连接？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Mars 长连接独立进程"><span class="nav-number">4.0.1.</span> <span class="nav-text">1. Mars 长连接独立进程 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 长连接进程复活"><span class="nav-number">4.0.2.</span> <span class="nav-text">2. 长连接进程复活 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 心跳机制"><span class="nav-number">4.0.3.</span> <span class="nav-text">3. 心跳机制 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4- 断开重连"><span class="nav-number">4.0.4.</span> <span class="nav-text">4. 断开重连 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#V-Mars 智能心跳机制"><span class="nav-number">5.</span> <span class="nav-text">V. Mars 智能心跳机制 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1- 固定心跳机制"><span class="nav-number">5.1.</span> <span class="nav-text">1. 固定心跳机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Mars 智能心跳策略"><span class="nav-number">5.2.</span> <span class="nav-text">2. Mars 智能心跳策略 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#自适应心跳"><span class="nav-number">5.2.0.1.</span> <span class="nav-text">自适应心跳 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#前后台策略"><span class="nav-number">5.2.0.2.</span> <span class="nav-text">前后台策略 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Alarm 对齐策略"><span class="nav-number">5.2.0.3.</span> <span class="nav-text">Alarm 对齐策略 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#其他"><span class="nav-number">5.2.0.4.</span> <span class="nav-text">其他 </span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VI- 长连接数据协议及加密"><span class="nav-number">6.</span> <span class="nav-text">VI. 长连接数据协议及加密 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VII- 长连接通道建设及容灾"><span class="nav-number">7.</span> <span class="nav-text">VII. 长连接通道建设及容灾 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">8.</span> <span class="nav-text">小结 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#《亿级 Android 架构》小专栏介绍"><span class="nav-number">8.1.</span> <span class="nav-text">《亿级 Android 架构》小专栏介绍 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考："><span class="nav-number">9.</span> <span class="nav-text">参考：</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
@@ -661,7 +834,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="icon-next-heart fa fa-heart"></i>
   </span>
